@@ -1,0 +1,14 @@
+#pragma once
+
+#include "core.h"
+#include "core/sdk.h"
+#include "sdk/datatypes/vector.h" // Äëÿ Vector_t è QAngle_t
+#include "sdk/entity.h" // Äëÿ C_CSPlayerPawn è HITBOX_*
+#include "sdk/datatypes/usercmd.h"
+
+namespace F::RAGEBOT
+{
+    void OnMove(CUserCmd* pCmd);
+    void Initialize();
+    void DumpSchema();
+}
