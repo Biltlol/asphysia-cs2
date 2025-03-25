@@ -1,0 +1,5 @@
+# Visual Studio temporary files
+.vs/
+*.ipch
+*.VC.db
+*.VC.opendb
