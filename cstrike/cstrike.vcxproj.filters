@@ -451,5 +451,8 @@
     <ClCompile Include="main.cpp">
       <Filter>utilities</Filter>
     </ClCompile>
+    <ClCompile Include="offsets.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
