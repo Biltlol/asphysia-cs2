@@ -165,74 +165,26 @@ namespace F::MISC::MOVEMENT
     }
 
     // Функция для банихопа
-    void BunnyHop(CUserCmd* pCmd, CBaseUserCmdPB* pUserCmd, C_CSPlayerPawn* pLocalPawn) noexcept
-    {
-        // Проверка входных параметров
-        if (!pCmd || !pUserCmd || !pLocalPawn)
-        {
-            L_PRINT(LOG_ERROR) << "BunnyHop: Invalid input parameters";
+    void movement::bunnyhop(CUserCmd* cmd) {
+        if (!settings::movement::bunnyhop)
             return;
-        }
 
-        // Проверка активности банихопа и серверной настройки
-        if (!C_GET(bool, Vars.bAutoBHop) || CONVAR::sv_autobunnyhopping->value.i1)
-        {
-            LOG_INFO << "BunnyHop: Disabled or server has autobunnyhopping enabled";
+        // Получаем локального игрока (используем Pawn)
+        auto localPlayer = memory::read<uintptr_t>(client::base + offsets::dwLocalPlayerPawn);
+        if (!localPlayer)
             return;
-        }
 
-        // Проверка состояния на земле
-        const bool onGround = (pLocalPawn->GetFlags() & FL_ONGROUND) != 0;
-        LOG_INFO << "BunnyHop: OnGround = " << (onGround ? "true" : "false");
+        // Проверяем, на земле ли игрок
+        int flags = memory::read<int>(localPlayer + offsets::m_fFlags);
+        bool onGround = (flags & (1 << 0)); // FL_ONGROUND
 
-        static bool lastJumped = false;
-        static bool shouldFakeJump = false;
-
-        if (onGround)
-        {
-            // Если игрок на земле и не прыгал в прошлом тике
-            if (!lastJumped && !shouldFakeJump)
-            {
-                lastJumped = true;
-                shouldFakeJump = true;
-
-                // Устанавливаем состояние прыжка
-                pCmd->nButtons.nValue |= IN_JUMP;
-                if (pUserCmd->pInButtonState)
-                {
-                    pUserCmd->pInButtonState->nValue |= IN_JUMP;
-                }
-
-                // Добавляем субтик для прыжка
-                AddSubtick(*pUserCmd, Button::Jump, true);
-                LOG_INFO << "BunnyHop: Jump initiated";
+        // Если нажата клавиша прыжка (пробел) и игрок на земле
+        if (cmd->buttons & IN_JUMP) {
+            if (onGround) {
+                cmd->buttons |= IN_JUMP; // Устанавливаем прыжок
             }
-            else
-            {
-                // Отпускаем кнопку прыжка, чтобы игра зарегистрировала новый прыжок
-                pCmd->nButtons.nValue &= ~IN_JUMP;
-                if (pUserCmd->pInButtonState)
-                {
-                    pUserCmd->pInButtonState->nValue &= ~IN_JUMP;
-                }
-            }
-        }
-        else
-        {
-            // Игрок в воздухе, сбрасываем состояние
-            lastJumped = false;
-            if (shouldFakeJump)
-            {
-                shouldFakeJump = false;
-                pCmd->nButtons.nValue &= ~IN_JUMP;
-                if (pUserCmd->pInButtonState)
-                {
-                    pUserCmd->pInButtonState->nValue &= ~IN_JUMP;
-                }
-
-                // Добавляем субтик для отпускания прыжка
-                AddSubtick(*pUserCmd, Button::Jump, false);
-                LOG_INFO << "BunnyHop: Jump released";
+            else {
+                cmd->buttons &= ~IN_JUMP; // Отпускаем прыжок в воздухе для следующего прыжка
             }
         }
     }
