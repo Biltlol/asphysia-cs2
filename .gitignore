@@ -1,5 +1,14 @@
-# Visual Studio temporary files
+# Игнорировать папку intermediate
+intermediate/
+
+# Игнорировать файлы сборки Visual Studio
+*.obj
+*.log
+*.tlog
+*.pdb
+*.idb
+*.lastbuildstate
+unsuccessfulbuild
+
+# Игнорировать папку .vs (если она всё ещё отслеживается)
 .vs/
-*.ipch
-*.VC.db
-*.VC.opendb
